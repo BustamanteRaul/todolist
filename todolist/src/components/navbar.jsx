@@ -1,7 +1,20 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
 const TABS = [
-  { id: "all", label: "Todas", Icon: IconList },
-  { id: "completed", label: "Completadas", Icon: IconCheckCircle },
-  { id: "pending", label: "Pendientes", Icon: IconCircle },
+  { id: "all", label: "Todas", Icon: IconList, path: "/" },
+  {
+    id: "completed",
+    label: "Completadas",
+    Icon: IconCheckCircle,
+    path: "/CompletedScreen",
+  },
+  {
+    id: "pending",
+    label: "Pendientes",
+    Icon: IconCircle,
+    path: "/PendingScreen",
+  },
 ];
 
 function IconList({ className }) {
@@ -61,10 +74,11 @@ function IconCircle({ className }) {
   );
 }
 
-export default function Navbar({ activeTab, setActiveTab }) {
+export default function Navbar() {
+  const [activeTab, setActiveTab] = useState("all");
   return (
     <nav className="todo-navbar" aria-label="Filtrar tareas">
-      {TABS.map(({ id, label, Icon }) => (
+      {TABS.map(({ id, label, Icon, path }) => (
         <button
           key={id}
           type="button"
@@ -72,8 +86,10 @@ export default function Navbar({ activeTab, setActiveTab }) {
           onClick={() => setActiveTab(id)}
           aria-current={activeTab === id ? "page" : undefined}
         >
-          <Icon className="todo-navbar__icon" />
-          <span className="todo-navbar__label">{label}</span>
+          <Link href={path}>
+            <Icon className="todo-navbar__icon" />
+            <span className="todo-navbar__label">{label}</span>
+          </Link>
         </button>
       ))}
     </nav>
