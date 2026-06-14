@@ -1,8 +1,13 @@
 import "./App.css";
+import { TaskProvider } from "./context/TaskContext";
 import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <TaskProvider>
+      <AppRoutes />
+    </TaskProvider>
+  );
 }
 
 export default App;

@@ -2,19 +2,41 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Navbar from "../components/navbar";
+import { useTasks } from "../context/TaskContext";
 
 export default function HomeScreen() {
+  const { tasks, addTask, toggleTask, editTask, deleteTask } = useTasks();
   const [inputValue, setInputValue] = useState("");
-  const [activeTaskIndex, setActiveTaskIndex] = useState(null);
-  const [tasks, setTasks] = useState([]);
+  const [activeTaskId, setActiveTaskId] = useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editValue, setEditValue] = useState("");
   const navigate = useNavigate();
-  const addTask = async (e) => {
+
+  const addTaskHandler = (e) => {
     e.preventDefault();
     if (inputValue.trim() === "") return;
-    const newTask = inputValue.trim();
-    setTasks([...tasks, newTask]);
+    addTask(inputValue.trim());
     setInputValue("");
   };
+
+  const startEditing = (task) => {
+    setEditValue(task.text);
+    setEditingTaskId(task.id);
+    setActiveTaskId(null);
+  };
+
+  const saveEdit = () => {
+    if (editValue.trim() === "") return;
+    editTask(editingTaskId, editValue.trim());
+    setEditingTaskId(null);
+    setEditValue("");
+  };
+
+  const cancelEdit = () => {
+    setEditingTaskId(null);
+    setEditValue("");
+  };
+
   return (
     <>
       <Navbar />
@@ -23,7 +45,7 @@ export default function HomeScreen() {
         Log-Out
       </button>
       <div className="todo-container">
-        <form className="todo-input-section" onSubmit={addTask}>
+        <form className="todo-input-section" onSubmit={addTaskHandler}>
           <input
             type="text"
             placeholder="Nueva tarea"
@@ -33,16 +55,33 @@ export default function HomeScreen() {
           <button type="submit">Agregar</button>
         </form>
 
-        {/* Lista de tareas / To-Do List */}
         <ul className="todo-list">
-          {tasks.map((task, index) => (
-            <li key={index} className="todo-item">
-              <span className="todo-item__text">{task}</span>
+          {tasks.map((task) => (
+            <li
+              key={task.id}
+              className={`todo-item ${task.completed ? "todo-item--completed" : ""}`}
+            >
+              {editingTaskId === task.id ? (
+                <input
+                  className="todo-item__edit-input"
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveEdit();
+                    if (e.key === "Escape") cancelEdit();
+                  }}
+                  onBlur={saveEdit}
+                  autoFocus
+                />
+              ) : (
+                <span className="todo-item__text">{task.text}</span>
+              )}
               <button
                 type="button"
                 className="todo-item__menu"
                 aria-label="Opciones de la tarea"
-                onClick={() => setActiveTaskIndex(index)}
+                onClick={() => setActiveTaskId(task.id)}
               >
                 ...
               </button>
@@ -50,11 +89,11 @@ export default function HomeScreen() {
           ))}
         </ul>
 
-        {activeTaskIndex !== null && (
+        {activeTaskId !== null && (
           <div
             className="action-sheet-overlay"
             role="presentation"
-            onClick={() => setActiveTaskIndex(null)}
+            onClick={() => setActiveTaskId(null)}
           >
             <div
               className="action-sheet"
@@ -63,27 +102,47 @@ export default function HomeScreen() {
               aria-labelledby="action-sheet-title"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Panel acción / Action panel */}
               <div className="action-sheet__panel">
                 <p id="action-sheet-title" className="action-sheet__title">
-                  {tasks[activeTaskIndex]}
+                  {tasks.find((t) => t.id === activeTaskId)?.text}
                 </p>
                 <div className="action-sheet__separator" />
                 <button
                   type="button"
                   className="action-sheet__btn"
                   onClick={() => {
-                    alert("Completada");
-                    setActiveTaskIndex(null);
+                    toggleTask(activeTaskId);
+                    setActiveTaskId(null);
                   }}
                 >
-                  Completada
+                  {tasks.find((t) => t.id === activeTaskId)?.completed
+                    ? "Reabrir"
+                    : "Completada"}
                 </button>
-
+                <button
+                  type="button"
+                  className="action-sheet__btn"
+                  onClick={() =>
+                    startEditing(tasks.find((t) => t.id === activeTaskId))
+                  }
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  className="action-sheet__btn action-sheet__btn--destructive"
+                  onClick={() => {
+                    deleteTask(activeTaskId);
+                    setActiveTaskId(null);
+                  }}
+                >
+                  Eliminar
+                </button>
+                <div className="action-sheet__separator" />
                 <button
                   type="button"
                   className="action-sheet__btn action-sheet__btn--cancel"
-                  onClick={() => setActiveTaskIndex(null)}
+                  onClick={() => setActiveTaskId(null)}
                 >
                   Cancelar
                 </button>

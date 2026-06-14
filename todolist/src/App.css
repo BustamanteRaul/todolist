@@ -255,6 +255,17 @@
   background: #005bb5;
 }
 
+.todo-item__edit-input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #007aff;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  background: #fff;
+  color: #1c1c1e;
+}
+
 @keyframes fadeIn {
 from { opacity: 0; }
 to { opacity: 1; }
