@@ -13,8 +13,11 @@ export function TaskProvider({ children }) {
     localStorage.setItem("tasks", JSON.stringify(newTasks));
   };
 
+  let nextId = Date.now();
+  const genId = () => `task_${++nextId}`;
+
   const addTask = (text) => {
-    const newTask = { id: crypto.randomUUID(), text, completed: false };
+    const newTask = { id: genId(), text, completed: false };
     syncTasks([...tasks, newTask]);
   };
 
