@@ -6,7 +6,7 @@ export default function CompletedChart({ tasks }) {
   const pct = total === 0 ? 0 : completed / total;
 
   const setup = (p5, canvasParentRef) => {
-    const w = 450;
+    const w = 300;
     const h = 30;
     p5.createCanvas(w, h).parent(canvasParentRef);
     p5.noLoop();
