@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CompletedChart from "../components/completed";
 import Header from "../components/header";
 import Navbar from "../components/navbar";
 import { useTasks } from "../context/TaskContext";
@@ -45,6 +46,7 @@ export default function HomeScreen() {
         Log-Out
       </button>
       <div className="todo-container">
+        <CompletedChart tasks={tasks} />
         <form className="todo-input-section" onSubmit={addTaskHandler}>
           <input
             type="text"
